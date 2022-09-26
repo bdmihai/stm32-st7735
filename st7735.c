@@ -44,7 +44,19 @@ void st7735_init(st7735_hw_control_t hw_control)
 
 void st7735_hardware_reset()
 {
+    hw.res_high();
+    hw.delay_us(5000);
+    hw.res_low();
+    hw.delay_us(5000);
+    hw.res_high();
+    hw.delay_us(50000);
+}
 
+void st7735_nop()
+{
+    const uint8_t command[] = { ST7735_CMD_NOP };
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t));
 }
 
 void st7735_software_reset()
@@ -94,7 +106,9 @@ void st7735_sleep_in_and_booster_off()
 
 void st7735_sleep_out_and_booster_on()
 {
-
+    const uint8_t command[] = { ST7735_CMD_SLPOUT };
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t));
 }
 
 void st7735_partial_mode_on()
@@ -104,12 +118,16 @@ void st7735_partial_mode_on()
 
 void st7735_normal_mode()
 {
-
+    const uint8_t command[] = { ST7735_CMD_NORON };
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t));
 }
 
 void st7735_display_inversion_off()
 {
-
+    const uint8_t command[] = { ST7735_CMD_INVOFF };
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t));
 }
 
 void st7735_display_inversion_on()
@@ -129,22 +147,44 @@ void st7735_display_off()
 
 void st7735_display_on()
 {
-
+    const uint8_t command[] = { ST7735_CMD_DISPON };
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t));
 }
 
-void st7735_column_address_set(uint8_t start, uint8_t end)
+void st7735_column_address_set(uint16_t start, uint16_t end)
 {
+    const uint8_t command[] = { ST7735_CMD_CASET };
+    const uint8_t data[] = { (uint8_t)(start >> 8), (uint8_t)start, (uint8_t)(end >> 8), (uint8_t)end };
 
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t));
+
+    hw.dc_high();
+    hw.data_wr(data, sizeof(data)/sizeof(uint8_t));
 }
 
-void st7735_row_address_set(uint8_t start, uint8_t end)
+void st7735_row_address_set(uint16_t start, uint16_t end)
 {
+    const uint8_t command[] = { ST7735_CMD_RASET };
+    const uint8_t data[] = { (uint8_t)(start >> 8), (uint8_t)start, (uint8_t)(end >> 8), (uint8_t)end };
 
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t));
+
+    hw.dc_high();
+    hw.data_wr(data, sizeof(data)/sizeof(uint8_t));
 }
 
-void st7735_memory_write(uint8_t value)
+void st7735_memory_write(uint8_t *data, uint16_t size)
 {
+    const uint8_t command[] = { ST7735_CMD_RAMWR };
+    
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t));
 
+    hw.dc_high();
+    hw.data_wr(data, size);
 }
 
 uint8_t st7735_memory_read()
@@ -163,9 +203,16 @@ void st7735_tearing_on(uint8_t mode)
 
 }
 
-void st7735_memory_data_access_control()
+void st7735_memory_data_access_control(uint8_t mx, uint8_t my, uint8_t mv, uint8_t ml, uint8_t mh, uint8_t rgb)
 {
+    const uint8_t command[] = { ST7735_CMD_MADCTL };
+    const uint8_t data[] = { (mx << 7) + (my << 6) + (mv << 5) + (ml << 4) + (rgb << 3) + (mh << 2) };
 
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t));
+
+    hw.dc_high();
+    hw.data_wr(data, sizeof(data)/sizeof(uint8_t));
 }
 
 void st7735_idle_mode_off()
@@ -178,9 +225,16 @@ void st7735_idle_mode_on()
 
 }
 
-void st7735_interface_pixel_format()
+void st7735_interface_pixel_format(uint8_t format)
 {
+    const uint8_t command[] = { ST7735_CMD_COLMOD };
+    const uint8_t data[] = { format };
 
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t));
+
+    hw.dc_high();
+    hw.data_wr(data, sizeof(data)/sizeof(uint8_t));
 }
 
 uint8_t st7735_read_id1()

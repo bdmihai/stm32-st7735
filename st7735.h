@@ -92,7 +92,7 @@
 #define ST7735_160_RWOS          160
 
 // standard RGB15 colors
-#define ST7735_RGB(R,G,B)        ((((uint16_t)B >> 3) << 11) + (((uint16_t)G >> 2) << 5) + ((uint16_t)R >> 3))
+#define ST7735_RGB(R,G,B)        ((((uint16_t)R >> 3) << 11) + (((uint16_t)G >> 2) << 5) + ((uint16_t)B >> 3))
 #define ST7735_BLACK             ST7735_RGB(0,0,0)
 #define ST7735_WHITE             ST7735_RGB(255,255,255)
 #define ST7735_RED	             ST7735_RGB(255,0,0)
@@ -110,23 +110,19 @@
 #define ST7735_TEAL              ST7735_RGB(0,128,128)
 #define ST7735_NAVY              ST7735_RGB(0,0,128)
 
-typedef void (*st7735_set_func_t)();
-typedef void (*st7735_write_func_t)(const uint8_t );
-typedef uint8_t (*st7735_read_func_t)();
-typedef void (*st7066u_delay_us)(const uint32_t);
+typedef void     (*st7735_set_func_t)();
+typedef uint16_t (*st7735_write_func_t)(const uint8_t *buffer, uint16_t size);
+typedef uint16_t (*st7735_read_func_t)(uint8_t *buffer, uint16_t size);
+typedef void     (*st7735_delay_us)(const uint32_t);
 
 typedef struct st7735_hw_control_t {
-    st7735_set_func_t cs_high;
-    st7735_set_func_t cs_low;
     st7735_set_func_t res_high;
     st7735_set_func_t res_low;
     st7735_set_func_t dc_high;
     st7735_set_func_t dc_low;
-    st7735_set_func_t dc_cs_high;
-    st7735_set_func_t dc_cs_low;
     st7735_write_func_t data_wr;
     st7735_read_func_t data_rd;
-    st7066u_delay_us delay_us;
+    st7735_delay_us delay_us;
 } st7735_hw_control_t;
 
 typedef struct st7735_action_t {
@@ -145,6 +141,7 @@ void st7735_init(st7735_hw_control_t hw_control);
 void st7735_hardware_reset();
 
 /* system commands */
+void st7735_nop();
 void st7735_software_reset();
 uint32_t st7735_read_display_id();
 uint32_t st7735_read_display_status();
@@ -162,17 +159,22 @@ void st7735_display_inversion_on();
 void st7735_gamma_curve_selection(uint8_t gamma_curve);
 void st7735_display_off();
 void st7735_display_on();
-void st7735_column_address_set(uint8_t start, uint8_t end);
-void st7735_row_address_set(uint8_t start, uint8_t end);
-void st7735_memory_write(uint8_t value);
+void st7735_column_address_set(uint16_t start, uint16_t end);
+void st7735_row_address_set(uint16_t start, uint16_t end);
+void st7735_memory_write(uint8_t *data, uint16_t size);
 uint8_t st7735_memory_read();
 void st7735_partial_start_end_address(uint8_t start, uint8_t end);
 void st7735_tearing_off();
 void st7735_tearing_on(uint8_t mode);
-void st7735_memory_data_access_control();
+void st7735_memory_data_access_control(uint8_t mx, uint8_t my, uint8_t mv, uint8_t ml, uint8_t mh, uint8_t rgb);
 void st7735_idle_mode_off();
 void st7735_idle_mode_on();
-void st7735_interface_pixel_format();
+
+#define ST7735_12_PIXEL 3
+#define ST7735_16_PIXEL 5
+#define ST7735_18_PIXEL 6
+void st7735_interface_pixel_format(uint8_t format);
+
 uint8_t st7735_read_id1();
 uint8_t st7735_read_id2();
 uint8_t st7735_read_id3();
