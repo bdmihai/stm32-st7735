@@ -91,6 +91,49 @@
 #define ST7735_128_COLS          128
 #define ST7735_160_RWOS          160
 
+/* definition of the 16bit color */
+typedef struct st7735_color_16_bit_t {
+    union
+    {
+        struct {
+            uint16_t g_msb:3;
+            uint16_t r:5;
+            uint16_t b:5;
+            uint16_t g_lsb:3;
+        };
+
+        struct {
+            uint8_t byte_1;
+            uint8_t byte_2;
+        };
+
+        struct {
+            uint16_t word_1;
+        };
+    };
+    
+
+
+} st7735_color_16_bit_t;
+
+#define RGB(R,G,B)  .r = (uint8_t)(R >> 3), .b = (uint8_t)(B >> 3), .g_lsb = (uint8_t)(G >> 2), .g_msb = (uint8_t)(G >> 5)
+static const st7735_color_16_bit_t rgb_black    = { RGB(0,0,0) };
+static const st7735_color_16_bit_t rgb_white    = { RGB(255,255,255) };
+static const st7735_color_16_bit_t rgb_red      = { RGB(255,0,0) };
+static const st7735_color_16_bit_t rgb_lime     = { RGB(0,255,0) };
+static const st7735_color_16_bit_t rgb_blue     = { RGB(0,0,255) };
+static const st7735_color_16_bit_t rgb_yellow   = { RGB(255,255,0) };
+static const st7735_color_16_bit_t rgb_cyan     = { RGB(0,255,255) };
+static const st7735_color_16_bit_t rgb_magenta  = { RGB(255,0,255) };
+static const st7735_color_16_bit_t rgb_sylver   = { RGB(192,192,192) };
+static const st7735_color_16_bit_t rgb_gray     = { RGB(128,128,128) };
+static const st7735_color_16_bit_t rgb_maroon   = { RGB(128,0,0) };
+static const st7735_color_16_bit_t rgb_olive    = { RGB(128,128,0) };
+static const st7735_color_16_bit_t rgb_green    = { RGB(0,128,0) };
+static const st7735_color_16_bit_t rgb_purple   = { RGB(128,0,128) };
+static const st7735_color_16_bit_t rgb_teal     = { RGB(0,128,128) };
+static const st7735_color_16_bit_t rgb_navy     = { RGB(0,0,128) };
+
 // standard RGB15 colors
 #define ST7735_RGB(R,G,B)        ((((uint16_t)R >> 3) << 11) + (((uint16_t)G >> 2) << 5) + ((uint16_t)B >> 3))
 #define ST7735_BLACK             ST7735_RGB(0,0,0)
@@ -111,7 +154,7 @@
 #define ST7735_NAVY              ST7735_RGB(0,0,128)
 
 typedef void     (*st7735_set_func_t)();
-typedef uint16_t (*st7735_write_func_t)(const uint8_t *buffer, uint16_t size);
+typedef uint16_t (*st7735_write_func_t)(const uint8_t *buffer, uint16_t size, uint16_t repeat);
 typedef uint16_t (*st7735_read_func_t)(uint8_t *buffer, uint16_t size);
 typedef void     (*st7735_delay_us)(const uint32_t);
 
@@ -161,7 +204,7 @@ void st7735_display_off();
 void st7735_display_on();
 void st7735_column_address_set(uint16_t start, uint16_t end);
 void st7735_row_address_set(uint16_t start, uint16_t end);
-void st7735_memory_write(uint8_t *data, uint16_t size);
+void st7735_memory_write(uint8_t *data, uint16_t size, uint16_t repeat);
 uint8_t st7735_memory_read();
 void st7735_partial_start_end_address(uint8_t start, uint8_t end);
 void st7735_tearing_off();
@@ -202,4 +245,14 @@ void gamma_adjustment_positive(uint8_t high, uint8_t mid[14], uint8_t low);
 void gamma_adjustment_negative(uint8_t high, uint8_t mid[14], uint8_t low);
 void extension_command_control();
 void vcom_4_level_control(uint8_t tc1, uint8_t tc2, uint8_t tc3);
+
+/* drawing primitives */
+void st7735_draw_fill(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, const st7735_color_16_bit_t color);
+void st7735_draw_h_line(uint8_t x1, uint8_t x2, uint8_t y, const st7735_color_16_bit_t color);
+void st7735_draw_v_line(uint8_t y1, uint8_t y2, uint8_t x, const st7735_color_16_bit_t color);
+void st7735_draw_line(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, const st7735_color_16_bit_t color);
+void st7735_draw_rectangle(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, const st7735_color_16_bit_t color, const st7735_color_16_bit_t fill);
+void st7735_draw_image(uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t *pixel_data);
+void st7735_draw_char(const uint8_t *font, uint8_t x, uint8_t y, st7735_color_16_bit_t color, st7735_color_16_bit_t background, const char c);
+void st7735_draw_string(const uint8_t *font, uint8_t x, uint8_t y, st7735_color_16_bit_t color, st7735_color_16_bit_t background, const char *s);
 
