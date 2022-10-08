@@ -1,6 +1,6 @@
 /*_____________________________________________________________________________
  │                                                                            |
- │ COPYRIGHT (C) 2020 Mihai Baneu                                             |
+ │ COPYRIGHT (C) 2022 Mihai Baneu                                             |
  │                                                                            |
  | Permission is hereby  granted,  free of charge,  to any person obtaining a |
  | copy of this software and associated documentation files (the "Software"), |
@@ -21,7 +21,7 @@
  | THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                 |
  |____________________________________________________________________________|
  |                                                                            |
- |  Author: Mihai Baneu                           Last modified: 26.Dec.2020  |
+ |  Author: Mihai Baneu                           Last modified: 08.Oct.2022  |
  |                                                                            |
  |___________________________________________________________________________*/
  
@@ -247,11 +247,14 @@ void extension_command_control();
 void vcom_4_level_control(uint8_t tc1, uint8_t tc2, uint8_t tc3);
 
 /* drawing primitives */
+void st7735_draw_pixel(uint8_t x, uint8_t y, const st7735_color_16_bit_t color);
 void st7735_draw_fill(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, const st7735_color_16_bit_t color);
 void st7735_draw_h_line(uint8_t x1, uint8_t x2, uint8_t y, const st7735_color_16_bit_t color);
 void st7735_draw_v_line(uint8_t y1, uint8_t y2, uint8_t x, const st7735_color_16_bit_t color);
 void st7735_draw_line(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, const st7735_color_16_bit_t color);
 void st7735_draw_rectangle(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, const st7735_color_16_bit_t color, const st7735_color_16_bit_t fill);
+void st7735_draw_fill_circle(uint8_t x, uint8_t y, uint8_t r, const st7735_color_16_bit_t color);
+void st7735_draw_circle(uint8_t x, uint8_t y, uint8_t r, const st7735_color_16_bit_t color);
 void st7735_draw_image(uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t *pixel_data);
 void st7735_draw_char(const uint8_t *font, uint8_t x, uint8_t y, st7735_color_16_bit_t color, st7735_color_16_bit_t background, const char c);
 void st7735_draw_string(const uint8_t *font, uint8_t x, uint8_t y, st7735_color_16_bit_t color, st7735_color_16_bit_t background, const char *s);

@@ -1,6 +1,6 @@
 /*_____________________________________________________________________________
  │                                                                            |
- │ COPYRIGHT (C) 2020 Mihai Baneu                                             |
+ │ COPYRIGHT (C) 2022 Mihai Baneu                                             |
  │                                                                            |
  | Permission is hereby  granted,  free of charge,  to any person obtaining a |
  | copy of this software and associated documentation files (the "Software"), |
@@ -21,7 +21,7 @@
  | THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                 |
  |____________________________________________________________________________|
  |                                                                            |
- |  Author: Mihai Baneu                           Last modified: 08.Dec.2020  |
+ |  Author: Mihai Baneu                           Last modified: 08.Oct.2022  |
  |                                                                            |
  |___________________________________________________________________________*/
 
@@ -30,6 +30,9 @@
   u8x8 original code from https://github.com/olikraus/u8g2/
   Copyright (c) 2016, olikraus@gmail.com
   All rights reserved.
+
+  Circle drawing based on Adafruit GFX library
+  Copyright (c) 2013 Adafruit Industries.  All rights reserved.
 */
 
 #include <stdint.h>
@@ -252,6 +255,13 @@ uint8_t st7735_read_id3()
     return 0;
 }
 
+void st7735_draw_pixel(uint8_t x, uint8_t y, const st7735_color_16_bit_t color)
+{
+    st7735_row_address_set(x, x);
+    st7735_column_address_set(y, y);
+    st7735_memory_write((uint8_t *)&color, sizeof(st7735_color_16_bit_t), 1);
+}
+
 void st7735_draw_fill(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, const st7735_color_16_bit_t color)
 {
     st7735_row_address_set(x1, x2);
@@ -289,9 +299,7 @@ static void draw_line_low(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, st7735
     int32_t y = y1;
 
     for (uint8_t x = x1; x <= x2; x++) {
-        st7735_row_address_set(x, x);
-        st7735_column_address_set(y, y);
-        st7735_memory_write((uint8_t *)&color, sizeof(st7735_color_16_bit_t), 1);
+        st7735_draw_pixel(x, y, color);
         if (D > 0) {
             y = y + yi;
             D = D + (2 * (dy - dx));
@@ -318,9 +326,7 @@ static void draw_line_high(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, const
     int32_t x = x1;
 
     for (uint8_t y = y1; y <= y2; y++) {
-        st7735_row_address_set(x, x);
-        st7735_column_address_set(y, y);
-        st7735_memory_write((uint8_t *)&color, sizeof(st7735_color_16_bit_t), 1);
+        st7735_draw_pixel(x, y, color);
         if (D > 0) {
             x = x + xi;
             D = D + (2 * (dx - dy));
@@ -358,6 +364,74 @@ void st7735_draw_rectangle(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, const
     st7735_row_address_set(x1+1, x2-1);
     st7735_column_address_set(y1+1, y2-1);
     st7735_memory_write((uint8_t *)&fill, sizeof(st7735_color_16_bit_t), (x2-x1-1)*(y2-y1-1)*sizeof(st7735_color_16_bit_t));
+}
+
+void st7735_draw_fill_circle(uint8_t x, uint8_t y, uint8_t r, const st7735_color_16_bit_t color)
+{
+    int16_t f = 1 - r;
+    int16_t ddF_x = 1;
+    int16_t ddF_y = -2 * r;
+    int16_t xx = 0;
+    int16_t yy = r;
+    int16_t px = xx;
+    int16_t py = yy;
+
+    st7735_draw_v_line(y - r, y + r, x, color);
+    while (xx < yy) {
+        if (f >= 0) {
+            yy--;
+            ddF_y += 2;
+            f += ddF_y;
+        }
+        xx++;
+        ddF_x += 2;
+        f += ddF_x;
+
+        if (xx < (yy + 1)) {
+            st7735_draw_v_line(y - yy, y + yy, x + xx, color);
+            st7735_draw_v_line(y - yy, y + yy, x - xx, color);
+        }
+        if (yy != py) {
+            st7735_draw_v_line(y - px, y + px, x + py, color);
+            st7735_draw_v_line(y - px, y + px, x - py, color);
+            py = yy;
+        }
+        px = xx;
+    }
+}
+
+void st7735_draw_circle(uint8_t x, uint8_t y, uint8_t r, const st7735_color_16_bit_t color)
+{
+    int16_t f = 1 - r;
+    int16_t ddF_x = 1;
+    int16_t ddF_y = -2 * r;
+    int16_t xx = 0;
+    int16_t yy = r;
+
+    st7735_draw_pixel(x, y + r, color);
+    st7735_draw_pixel(x, y - r, color);
+    st7735_draw_pixel(x + r, y, color);
+    st7735_draw_pixel(x - r, y, color);
+
+    while (xx < yy) {
+        if (f >= 0) {
+            yy--;
+            ddF_y += 2;
+            f += ddF_y;
+        }
+        xx++;
+        ddF_x += 2;
+        f += ddF_x;
+
+        st7735_draw_pixel(x + xx, y + yy, color);
+        st7735_draw_pixel(x - xx, y + yy, color);
+        st7735_draw_pixel(x + xx, y - yy, color);
+        st7735_draw_pixel(x - xx, y - yy, color);
+        st7735_draw_pixel(x + yy, y + xx, color);
+        st7735_draw_pixel(x - yy, y + xx, color);
+        st7735_draw_pixel(x + yy, y - xx, color);
+        st7735_draw_pixel(x - yy, y - xx, color);
+    }
 }
 
 void st7735_draw_image(uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t *pixel_data)
