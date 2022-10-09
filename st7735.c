@@ -36,6 +36,7 @@
 */
 
 #include <stdint.h>
+#include <stdlib.h>
 #include "st7735.h"
 
 st7735_hw_control_t hw;
@@ -64,12 +65,23 @@ void st7735_nop()
 
 void st7735_software_reset()
 {
-
+    const uint8_t command[] = { ST7735_CMD_SWRESET };
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
 }
 
 uint32_t st7735_read_display_id()
 {
-    return 0;
+    const uint8_t command[] = { ST7735_CMD_RDDID };
+    uint8_t data[] = { 0, 0, 0, 0 };
+
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
+
+    hw.dc_high();
+    hw.data_rd(data, sizeof(data)/sizeof(uint8_t));
+
+    return ((uint32_t)data[0] << 17) + ((uint32_t)data[1] << 9) + ((uint32_t)data[2] << 1) + ((uint32_t)data[3] >> 7);
 }
 
 uint32_t st7735_read_display_status()
@@ -84,7 +96,16 @@ uint8_t st7735_read_display_power()
 
 uint8_t st7735_read_display_memory_address_control()
 {
-    return 0;
+    const uint8_t command[] = { ST7735_CMD_RDDMADCTL };
+    uint8_t data[] = { 0 };
+
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
+
+    hw.dc_high();
+    hw.data_rd(data, sizeof(data)/sizeof(uint8_t));
+
+    return data[0];
 }
 
 uint8_t st7735_read_display_pixel_format()
@@ -116,7 +137,9 @@ void st7735_sleep_out_and_booster_on()
 
 void st7735_partial_mode_on()
 {
-
+    const uint8_t command[] = { ST7735_CMD_PTLON };
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
 }
 
 void st7735_normal_mode()
@@ -135,7 +158,9 @@ void st7735_display_inversion_off()
 
 void st7735_display_inversion_on()
 {
-
+    const uint8_t command[] = { ST7735_CMD_INVON };
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
 }
 
 void st7735_gamma_curve_selection(uint8_t gamma_curve)
@@ -145,7 +170,9 @@ void st7735_gamma_curve_selection(uint8_t gamma_curve)
 
 void st7735_display_off()
 {
-
+    const uint8_t command[] = { ST7735_CMD_DISPOFF };
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
 }
 
 void st7735_display_on()
@@ -197,19 +224,39 @@ uint8_t st7735_memory_read()
 
 void st7735_partial_start_end_address(uint8_t start, uint8_t end)
 {
+    const uint8_t command[] = { ST7735_CMD_PTLAR };
+    const uint8_t data[] = { (uint8_t)(start >> 8), (uint8_t)start, (uint8_t)(end >> 8), (uint8_t)end };
 
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
+
+    hw.dc_high();
+    hw.data_wr(data, sizeof(data)/sizeof(uint8_t), 1);
 }
 
-void st7735_tearing_off();
+void st7735_tearing_off()
+{
+    const uint8_t command[] = { ST7735_CMD_TEOFF };
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
+}
+
 void st7735_tearing_on(uint8_t mode)
 {
+    const uint8_t command[] = { ST7735_CMD_TEON };
+    const uint8_t data[] = { mode };
 
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
+
+    hw.dc_high();
+    hw.data_wr(data, sizeof(data)/sizeof(uint8_t), 1);
 }
 
-void st7735_memory_data_access_control(uint8_t mx, uint8_t my, uint8_t mv, uint8_t ml, uint8_t mh, uint8_t rgb)
+void st7735_memory_data_access_control(uint8_t my, uint8_t mx, uint8_t mv, uint8_t ml, uint8_t rgb, uint8_t mh)
 {
     const uint8_t command[] = { ST7735_CMD_MADCTL };
-    const uint8_t data[] = { (mx << 7) + (my << 6) + (mv << 5) + (ml << 4) + (rgb << 3) + (mh << 2) };
+    const uint8_t data[] = { (my << 7) + (mx << 6) + (mv << 5) + (ml << 4) + (rgb << 3) + (mh << 2) };
 
     hw.dc_low();
     hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
@@ -220,12 +267,16 @@ void st7735_memory_data_access_control(uint8_t mx, uint8_t my, uint8_t mv, uint8
 
 void st7735_idle_mode_off()
 {
-
+    const uint8_t command[] = { ST7735_CMD_IDMOFF };
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
 }
 
 void st7735_idle_mode_on()
 {
-
+    const uint8_t command[] = { ST7735_CMD_IDMON };
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
 }
 
 void st7735_interface_pixel_format(uint8_t format)
@@ -242,17 +293,44 @@ void st7735_interface_pixel_format(uint8_t format)
 
 uint8_t st7735_read_id1()
 {
-    return 0;
+    const uint8_t command[] = { ST7735_CMD_RDID1 };
+    uint8_t data[] = { 0 };
+
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
+
+    hw.dc_high();
+    hw.data_rd(data, sizeof(data)/sizeof(uint8_t));
+
+    return data[0];
 }
 
 uint8_t st7735_read_id2()
 {
-    return 0;
+    const uint8_t command[] = { ST7735_CMD_RDID2 };
+    uint8_t data[] = { 0 };
+
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
+
+    hw.dc_high();
+    hw.data_rd(data, sizeof(data)/sizeof(uint8_t));
+
+    return data[0];
 }
 
 uint8_t st7735_read_id3()
 {
-    return 0;
+    const uint8_t command[] = { ST7735_CMD_RDID3 };
+    uint8_t data[] = { 0 };
+
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
+
+    hw.dc_high();
+    hw.data_rd(data, sizeof(data)/sizeof(uint8_t));
+
+    return data[0];
 }
 
 void st7735_draw_pixel(uint8_t x, uint8_t y, const st7735_color_16_bit_t color)

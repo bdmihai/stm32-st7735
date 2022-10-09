@@ -91,6 +91,13 @@
 #define ST7735_128_COLS          128
 #define ST7735_160_RWOS          160
 
+// well defined parameters
+#define ST7735_12_PIXEL 3
+#define ST7735_16_PIXEL 5
+#define ST7735_18_PIXEL 6
+#define ST7735_TELOM_V  0
+#define ST7735_TELOM_HV 1
+
 /* definition of the 16bit color */
 typedef struct st7735_color_16_bit_t {
     union
@@ -111,47 +118,25 @@ typedef struct st7735_color_16_bit_t {
             uint16_t word_1;
         };
     };
-    
-
-
 } st7735_color_16_bit_t;
 
-#define RGB(R,G,B)  .r = (uint8_t)(R >> 3), .b = (uint8_t)(B >> 3), .g_lsb = (uint8_t)(G >> 2), .g_msb = (uint8_t)(G >> 5)
-static const st7735_color_16_bit_t rgb_black    = { RGB(0,0,0) };
-static const st7735_color_16_bit_t rgb_white    = { RGB(255,255,255) };
-static const st7735_color_16_bit_t rgb_red      = { RGB(255,0,0) };
-static const st7735_color_16_bit_t rgb_lime     = { RGB(0,255,0) };
-static const st7735_color_16_bit_t rgb_blue     = { RGB(0,0,255) };
-static const st7735_color_16_bit_t rgb_yellow   = { RGB(255,255,0) };
-static const st7735_color_16_bit_t rgb_cyan     = { RGB(0,255,255) };
-static const st7735_color_16_bit_t rgb_magenta  = { RGB(255,0,255) };
-static const st7735_color_16_bit_t rgb_sylver   = { RGB(192,192,192) };
-static const st7735_color_16_bit_t rgb_gray     = { RGB(128,128,128) };
-static const st7735_color_16_bit_t rgb_maroon   = { RGB(128,0,0) };
-static const st7735_color_16_bit_t rgb_olive    = { RGB(128,128,0) };
-static const st7735_color_16_bit_t rgb_green    = { RGB(0,128,0) };
-static const st7735_color_16_bit_t rgb_purple   = { RGB(128,0,128) };
-static const st7735_color_16_bit_t rgb_teal     = { RGB(0,128,128) };
-static const st7735_color_16_bit_t rgb_navy     = { RGB(0,0,128) };
-
-// standard RGB15 colors
-#define ST7735_RGB(R,G,B)        ((((uint16_t)R >> 3) << 11) + (((uint16_t)G >> 2) << 5) + ((uint16_t)B >> 3))
-#define ST7735_BLACK             ST7735_RGB(0,0,0)
-#define ST7735_WHITE             ST7735_RGB(255,255,255)
-#define ST7735_RED	             ST7735_RGB(255,0,0)
-#define ST7735_LIME              ST7735_RGB(0,255,0)
-#define ST7735_BLUE              ST7735_RGB(0,0,255)
-#define ST7735_YELLOW            ST7735_RGB(255,255,0)
-#define ST7735_CYAN              ST7735_RGB(0,255,255)
-#define ST7735_MAGENTA           ST7735_RGB(255,0,255)
-#define ST7735_SILVER            ST7735_RGB(192,192,192)
-#define ST7735_GRAY              ST7735_RGB(128,128,128)
-#define ST7735_MAROON            ST7735_RGB(128,0,0)
-#define ST7735_OLIVE             ST7735_RGB(128,128,0)
-#define ST7735_GREEN             ST7735_RGB(0,128,0)
-#define ST7735_PURPLE            ST7735_RGB(128,0,128)
-#define ST7735_TEAL              ST7735_RGB(0,128,128)
-#define ST7735_NAVY              ST7735_RGB(0,0,128)
+#define ST7735_RGB(R,G,B)  .r = (uint8_t)(R >> 3) & 0x1F, .b = (uint8_t)(B >> 3) & 0x1F, .g_lsb = (uint8_t)(G >> 2) & 0x07, .g_msb = (uint8_t)(G >> 5) & 0x07
+static const st7735_color_16_bit_t st7735_rgb_black   = { ST7735_RGB(0,0,0) };
+static const st7735_color_16_bit_t st7735_rgb_white   = { ST7735_RGB(255,255,255) };
+static const st7735_color_16_bit_t st7735_rgb_red     = { ST7735_RGB(255,0,0) };
+static const st7735_color_16_bit_t st7735_rgb_lime    = { ST7735_RGB(0,255,0) };
+static const st7735_color_16_bit_t st7735_rgb_blue    = { ST7735_RGB(0,0,255) };
+static const st7735_color_16_bit_t st7735_rgb_yellow  = { ST7735_RGB(255,255,0) };
+static const st7735_color_16_bit_t st7735_rgb_cyan    = { ST7735_RGB(0,255,255) };
+static const st7735_color_16_bit_t st7735_rgb_magenta = { ST7735_RGB(255,0,255) };
+static const st7735_color_16_bit_t st7735_rgb_sylver  = { ST7735_RGB(192,192,192) };
+static const st7735_color_16_bit_t st7735_rgb_gray    = { ST7735_RGB(128,128,128) };
+static const st7735_color_16_bit_t st7735_rgb_maroon  = { ST7735_RGB(128,0,0) };
+static const st7735_color_16_bit_t st7735_rgb_olive   = { ST7735_RGB(128,128,0) };
+static const st7735_color_16_bit_t st7735_rgb_green   = { ST7735_RGB(0,128,0) };
+static const st7735_color_16_bit_t st7735_rgb_purple  = { ST7735_RGB(128,0,128) };
+static const st7735_color_16_bit_t st7735_rgb_teal    = { ST7735_RGB(0,128,128) };
+static const st7735_color_16_bit_t st7735_rgb_navy    = { ST7735_RGB(0,0,128) };
 
 typedef void     (*st7735_set_func_t)();
 typedef uint16_t (*st7735_write_func_t)(const uint8_t *buffer, uint16_t size, uint16_t repeat);
@@ -209,13 +194,9 @@ uint8_t st7735_memory_read();
 void st7735_partial_start_end_address(uint8_t start, uint8_t end);
 void st7735_tearing_off();
 void st7735_tearing_on(uint8_t mode);
-void st7735_memory_data_access_control(uint8_t mx, uint8_t my, uint8_t mv, uint8_t ml, uint8_t mh, uint8_t rgb);
+void st7735_memory_data_access_control(uint8_t my, uint8_t mx, uint8_t mv, uint8_t ml, uint8_t rgb, uint8_t mh);
 void st7735_idle_mode_off();
 void st7735_idle_mode_on();
-
-#define ST7735_12_PIXEL 3
-#define ST7735_16_PIXEL 5
-#define ST7735_18_PIXEL 6
 void st7735_interface_pixel_format(uint8_t format);
 
 uint8_t st7735_read_id1();
