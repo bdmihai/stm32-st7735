@@ -21,7 +21,7 @@
  | THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                 |
  |____________________________________________________________________________|
  |                                                                            |
- |  Author: Mihai Baneu                           Last modified: 08.Oct.2022  |
+ |  Author: Mihai Baneu                           Last modified: 10.Oct.2022  |
  |                                                                            |
  |___________________________________________________________________________*/
 
@@ -70,7 +70,7 @@ void st7735_software_reset()
     hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
 }
 
-uint32_t st7735_read_display_id()
+void st7735_read_display_id(uint32_t *id)
 {
     const uint8_t command[] = { ST7735_CMD_RDDID };
     uint8_t data[] = { 0, 0, 0, 0 };
@@ -81,51 +81,80 @@ uint32_t st7735_read_display_id()
     hw.dc_high();
     hw.data_rd(data, sizeof(data)/sizeof(uint8_t));
 
-    return ((uint32_t)data[0] << 17) + ((uint32_t)data[1] << 9) + ((uint32_t)data[2] << 1) + ((uint32_t)data[3] >> 7);
+    *id = ((uint32_t)data[0] << 17) + ((uint32_t)data[1] << 9) + ((uint32_t)data[2] << 1) + ((uint32_t)data[3] >> 7);
 }
 
-uint32_t st7735_read_display_status()
+void st7735_read_display_status(uint8_t *status)
 {
-    return 0;
-}
-
-uint8_t st7735_read_display_power()
-{
-    return 0;
-}
-
-uint8_t st7735_read_display_memory_address_control()
-{
-    const uint8_t command[] = { ST7735_CMD_RDDMADCTL };
-    uint8_t data[] = { 0 };
+    const uint8_t command[] = { ST7735_CMD_RDDST };
 
     hw.dc_low();
     hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
 
     hw.dc_high();
-    hw.data_rd(data, sizeof(data)/sizeof(uint8_t));
-
-    return data[0];
+    hw.data_rd(status, 4);
 }
 
-uint8_t st7735_read_display_pixel_format()
+void st7735_read_display_power(uint8_t *power)
 {
-    return 0;
+    const uint8_t command[] = { ST7735_CMD_RDDPM };
+
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
+
+    hw.dc_high();
+    hw.data_rd(power, 1);
 }
 
-uint8_t st7735_read_display_image()
+void st7735_read_display_memory_address_control(uint8_t *mode)
 {
-    return 0;
+    const uint8_t command[] = { ST7735_CMD_RDDMADCTL };
+
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
+
+    hw.dc_high();
+    hw.data_rd(mode, 1);
 }
 
-uint8_t st7735_read_display_signal()
+void st7735_read_display_pixel_format(uint8_t *mode)
 {
-    return 0;
+    const uint8_t command[] = { ST7735_CMD_RDDCOLMOD };
+
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
+
+    hw.dc_high();
+    hw.data_rd(mode, 1);
+}
+
+void st7735_read_display_image(uint8_t *image)
+{
+    const uint8_t command[] = { ST7735_CMD_RDDIM };
+
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
+
+    hw.dc_high();
+    hw.data_rd(image, 1);
+}
+
+void st7735_read_display_signal(uint8_t *signal)
+{
+    const uint8_t command[] = { ST7735_CMD_RDDSM };
+
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
+
+    hw.dc_high();
+    hw.data_rd(signal, 1);
 }
 
 void st7735_sleep_in_and_booster_off()
 {
-
+    const uint8_t command[] = { ST7735_CMD_SLPIN };
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
 }
 
 void st7735_sleep_out_and_booster_on()
@@ -165,7 +194,14 @@ void st7735_display_inversion_on()
 
 void st7735_gamma_curve_selection(uint8_t gamma_curve)
 {
+    const uint8_t command[] = { ST7735_CMD_GAMSET };
+    const uint8_t data[] = { gamma_curve };
 
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
+
+    hw.dc_high();
+    hw.data_wr(data, sizeof(data)/sizeof(uint8_t), 1);
 }
 
 void st7735_display_off()
@@ -217,9 +253,15 @@ void st7735_memory_write(uint8_t *data, uint16_t size, uint16_t repeat)
     hw.data_wr(data, size, repeat);
 }
 
-uint8_t st7735_memory_read()
+void st7735_memory_read(uint8_t *data, uint16_t size)
 {
-    return 0;
+    const uint8_t command[] = { ST7735_CMD_RAMRD };
+
+    hw.dc_low();
+    hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
+
+    hw.dc_high();
+    hw.data_rd(data, size);
 }
 
 void st7735_partial_start_end_address(uint8_t start, uint8_t end)
@@ -291,46 +333,37 @@ void st7735_interface_pixel_format(uint8_t format)
     hw.data_wr(data, sizeof(data)/sizeof(uint8_t), 1);
 }
 
-uint8_t st7735_read_id1()
+void st7735_read_id1(uint8_t *id)
 {
     const uint8_t command[] = { ST7735_CMD_RDID1 };
-    uint8_t data[] = { 0 };
 
     hw.dc_low();
     hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
 
     hw.dc_high();
-    hw.data_rd(data, sizeof(data)/sizeof(uint8_t));
-
-    return data[0];
+    hw.data_rd(id, 1);
 }
 
-uint8_t st7735_read_id2()
+void st7735_read_id2(uint8_t *id)
 {
     const uint8_t command[] = { ST7735_CMD_RDID2 };
-    uint8_t data[] = { 0 };
 
     hw.dc_low();
     hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
 
     hw.dc_high();
-    hw.data_rd(data, sizeof(data)/sizeof(uint8_t));
-
-    return data[0];
+    hw.data_rd(id, 1);
 }
 
-uint8_t st7735_read_id3()
+void st7735_read_id3(uint8_t *id)
 {
     const uint8_t command[] = { ST7735_CMD_RDID3 };
-    uint8_t data[] = { 0 };
 
     hw.dc_low();
     hw.data_wr(command, sizeof(command)/sizeof(uint8_t), 1);
 
     hw.dc_high();
-    hw.data_rd(data, sizeof(data)/sizeof(uint8_t));
-
-    return data[0];
+    hw.data_rd(id, 1);
 }
 
 void st7735_draw_pixel(uint8_t x, uint8_t y, const st7735_color_16_bit_t color)

@@ -120,7 +120,9 @@ typedef struct st7735_color_16_bit_t {
     };
 } st7735_color_16_bit_t;
 
-#define ST7735_RGB(R,G,B)  .r = (uint8_t)(R >> 3) & 0x1F, .b = (uint8_t)(B >> 3) & 0x1F, .g_lsb = (uint8_t)(G >> 2) & 0x07, .g_msb = (uint8_t)(G >> 5) & 0x07
+#define ST7735_RGB(R,G,B) .r = (uint8_t)(R >> 3) & 0x1F, .b = (uint8_t)(B >> 3) & 0x1F, .g_lsb = (uint8_t)(G >> 2) & 0x07, .g_msb = (uint8_t)(G >> 5) & 0x07
+#define ST7735_RGB_18bit(R,G,B) .r = (uint8_t)(R >> 2) & 0x1F, .b = (uint8_t)(B >> 2) & 0x1F, .g_lsb = (uint8_t)(G >> 1) & 0x07, .g_msb = (uint8_t)(G >> 4) & 0x07
+
 static const st7735_color_16_bit_t st7735_rgb_black   = { ST7735_RGB(0,0,0) };
 static const st7735_color_16_bit_t st7735_rgb_white   = { ST7735_RGB(255,255,255) };
 static const st7735_color_16_bit_t st7735_rgb_red     = { ST7735_RGB(255,0,0) };
@@ -171,13 +173,13 @@ void st7735_hardware_reset();
 /* system commands */
 void st7735_nop();
 void st7735_software_reset();
-uint32_t st7735_read_display_id();
-uint32_t st7735_read_display_status();
-uint8_t st7735_read_display_power();
-uint8_t st7735_read_display_memory_address_control();
-uint8_t st7735_read_display_pixel_format();
-uint8_t st7735_read_display_image();
-uint8_t st7735_read_display_signal();
+void st7735_read_display_id(uint32_t *id);
+void st7735_read_display_status(uint8_t *status);
+void st7735_read_display_power(uint8_t *power);
+void st7735_read_display_memory_address_control(uint8_t *mode);
+void st7735_read_display_pixel_format(uint8_t *mode);
+void st7735_read_display_image(uint8_t *image);
+void st7735_read_display_signal(uint8_t *signal);
 void st7735_sleep_in_and_booster_off();
 void st7735_sleep_out_and_booster_on();
 void st7735_partial_mode_on();
@@ -190,7 +192,7 @@ void st7735_display_on();
 void st7735_column_address_set(uint16_t start, uint16_t end);
 void st7735_row_address_set(uint16_t start, uint16_t end);
 void st7735_memory_write(uint8_t *data, uint16_t size, uint16_t repeat);
-uint8_t st7735_memory_read();
+void st7735_memory_read(uint8_t *data, uint16_t size);
 void st7735_partial_start_end_address(uint8_t start, uint8_t end);
 void st7735_tearing_off();
 void st7735_tearing_on(uint8_t mode);
@@ -198,34 +200,33 @@ void st7735_memory_data_access_control(uint8_t my, uint8_t mx, uint8_t mv, uint8
 void st7735_idle_mode_off();
 void st7735_idle_mode_on();
 void st7735_interface_pixel_format(uint8_t format);
-
-uint8_t st7735_read_id1();
-uint8_t st7735_read_id2();
-uint8_t st7735_read_id3();
+void st7735_read_id1(uint8_t *id);
+void st7735_read_id2(uint8_t *id);
+void st7735_read_id3(uint8_t *id);
 
 /* panel commands */
-void frame_rate_control_1(uint8_t rtna, uint8_t fpa, uint8_t bpa);
-void frame_rate_control_2(uint8_t rtnb, uint8_t fpb, uint8_t bpb);
-void frame_rate_control_3(uint8_t rtnc, uint8_t fpc, uint8_t bpc, uint8_t rtnd, uint8_t fpd, uint8_t bpd);
-void display_inversion_control(uint8_t nla, uint8_t nlb, uint8_t nlc);
-void display_function_setting(uint8_t no, uint8_t sdt, uint8_t eq, uint8_t ptg, uint8_t pt);
-void power_control_1(uint8_t vrh, uint8_t ib_sel);
-void power_control_2(uint8_t bt);
-void power_control_3(uint8_t apa, uint8_t dca);
-void power_control_4(uint8_t apb, uint8_t dcb);
-void power_control_5(uint8_t apc, uint8_t dcc);
-void power_control_6(uint8_t apa, uint8_t apb, uint8_t apc, uint8_t dcd);
-void vcom_control(uint8_t vmh, uint8_t vml);
-void set_vcom_offset(uint8_t vmf);
-void set_lcm_version_code(uint8_t id2);
-void set_customer_project_code(uint8_t id3);
-void eeprom_control_status(uint8_t vmf_en, uint8_t id2_en);
-void eeprom_read_command();
-void eeprom_write_command(uint8_t ee_ib, uint8_t ee_cmd);
-void gamma_adjustment_positive(uint8_t high, uint8_t mid[14], uint8_t low);
-void gamma_adjustment_negative(uint8_t high, uint8_t mid[14], uint8_t low);
-void extension_command_control();
-void vcom_4_level_control(uint8_t tc1, uint8_t tc2, uint8_t tc3);
+// void st7735_frame_rate_control_1(uint8_t rtna, uint8_t fpa, uint8_t bpa);
+// void st7735_frame_rate_control_2(uint8_t rtnb, uint8_t fpb, uint8_t bpb);
+// void st7735_frame_rate_control_3(uint8_t rtnc, uint8_t fpc, uint8_t bpc, uint8_t rtnd, uint8_t fpd, uint8_t bpd);
+// void st7735_display_inversion_control(uint8_t nla, uint8_t nlb, uint8_t nlc);
+// void st7735_display_function_setting(uint8_t no, uint8_t sdt, uint8_t eq, uint8_t ptg, uint8_t pt);
+// void st7735_power_control_1(uint8_t vrh, uint8_t ib_sel);
+// void st7735_power_control_2(uint8_t bt);
+// void st7735_power_control_3(uint8_t apa, uint8_t dca);
+// void st7735_power_control_4(uint8_t apb, uint8_t dcb);
+// void st7735_power_control_5(uint8_t apc, uint8_t dcc);
+// void st7735_power_control_6(uint8_t apa, uint8_t apb, uint8_t apc, uint8_t dcd);
+// void st7735_vcom_control(uint8_t vmh, uint8_t vml);
+// void st7735_set_vcom_offset(uint8_t vmf);
+// void st7735_set_lcm_version_code(uint8_t id2);
+// void st7735_set_customer_project_code(uint8_t id3);
+// void st7735_eeprom_control_status(uint8_t vmf_en, uint8_t id2_en);
+// void st7735_eeprom_read_command();
+// void st7735_eeprom_write_command(uint8_t ee_ib, uint8_t ee_cmd);
+// void st7735_gamma_adjustment_positive(uint8_t high, uint8_t mid[14], uint8_t low);
+// void st7735_gamma_adjustment_negative(uint8_t high, uint8_t mid[14], uint8_t low);
+// void st7735_extension_command_control();
+// void st7735_vcom_4_level_control(uint8_t tc1, uint8_t tc2, uint8_t tc3);
 
 /* drawing primitives */
 void st7735_draw_pixel(uint8_t x, uint8_t y, const st7735_color_16_bit_t color);
