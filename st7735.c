@@ -39,7 +39,7 @@
 #include <stdlib.h>
 #include "st7735.h"
 
-st7735_hw_control_t hw;
+static st7735_hw_control_t hw;
 
 void st7735_init(st7735_hw_control_t hw_control)
 {
