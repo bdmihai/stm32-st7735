@@ -27,6 +27,10 @@
  
 #pragma once
 
+#ifdef __cplusplus
+    extern "C" {
+#endif
+
 /* System Function Command */
 #define ST7735_CMD_NOP           0x00
 #define ST7735_CMD_SWRESET       0x01 /* software reset */
@@ -123,22 +127,22 @@ typedef struct st7735_color_16_bit_t {
 #define ST7735_RGB(R,G,B) .r = (uint8_t)(R >> 3) & 0x1F, .b = (uint8_t)(B >> 3) & 0x1F, .g_lsb = (uint8_t)(G >> 2) & 0x07, .g_msb = (uint8_t)(G >> 5) & 0x07
 #define ST7735_RGB_18bit(R,G,B) .r = (uint8_t)(R >> 2) & 0x1F, .b = (uint8_t)(B >> 2) & 0x1F, .g_lsb = (uint8_t)(G >> 1) & 0x07, .g_msb = (uint8_t)(G >> 4) & 0x07
 
-static const st7735_color_16_bit_t st7735_rgb_black   = { ST7735_RGB(0,0,0) };
-static const st7735_color_16_bit_t st7735_rgb_white   = { ST7735_RGB(255,255,255) };
-static const st7735_color_16_bit_t st7735_rgb_red     = { ST7735_RGB(255,0,0) };
-static const st7735_color_16_bit_t st7735_rgb_lime    = { ST7735_RGB(0,255,0) };
-static const st7735_color_16_bit_t st7735_rgb_blue    = { ST7735_RGB(0,0,255) };
-static const st7735_color_16_bit_t st7735_rgb_yellow  = { ST7735_RGB(255,255,0) };
-static const st7735_color_16_bit_t st7735_rgb_cyan    = { ST7735_RGB(0,255,255) };
-static const st7735_color_16_bit_t st7735_rgb_magenta = { ST7735_RGB(255,0,255) };
-static const st7735_color_16_bit_t st7735_rgb_sylver  = { ST7735_RGB(192,192,192) };
-static const st7735_color_16_bit_t st7735_rgb_gray    = { ST7735_RGB(128,128,128) };
-static const st7735_color_16_bit_t st7735_rgb_maroon  = { ST7735_RGB(128,0,0) };
-static const st7735_color_16_bit_t st7735_rgb_olive   = { ST7735_RGB(128,128,0) };
-static const st7735_color_16_bit_t st7735_rgb_green   = { ST7735_RGB(0,128,0) };
-static const st7735_color_16_bit_t st7735_rgb_purple  = { ST7735_RGB(128,0,128) };
-static const st7735_color_16_bit_t st7735_rgb_teal    = { ST7735_RGB(0,128,128) };
-static const st7735_color_16_bit_t st7735_rgb_navy    = { ST7735_RGB(0,0,128) };
+extern const st7735_color_16_bit_t st7735_rgb_black;
+extern const st7735_color_16_bit_t st7735_rgb_white;
+extern const st7735_color_16_bit_t st7735_rgb_red;
+extern const st7735_color_16_bit_t st7735_rgb_lime;
+extern const st7735_color_16_bit_t st7735_rgb_blue;
+extern const st7735_color_16_bit_t st7735_rgb_yellow;
+extern const st7735_color_16_bit_t st7735_rgb_cyan;
+extern const st7735_color_16_bit_t st7735_rgb_magenta;
+extern const st7735_color_16_bit_t st7735_rgb_sylver;
+extern const st7735_color_16_bit_t st7735_rgb_gray;
+extern const st7735_color_16_bit_t st7735_rgb_maroon;
+extern const st7735_color_16_bit_t st7735_rgb_olive;
+extern const st7735_color_16_bit_t st7735_rgb_green;
+extern const st7735_color_16_bit_t st7735_rgb_purple;
+extern const st7735_color_16_bit_t st7735_rgb_teal;
+extern const st7735_color_16_bit_t st7735_rgb_navy;
 
 typedef void     (*st7735_set_func_t)();
 typedef uint16_t (*st7735_write_func_t)(const uint8_t *buffer, uint16_t size, uint16_t repeat);
@@ -241,3 +245,6 @@ void st7735_draw_image(uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint
 void st7735_draw_char(const uint8_t *font, uint8_t x, uint8_t y, st7735_color_16_bit_t color, st7735_color_16_bit_t background, const char c);
 void st7735_draw_string(const uint8_t *font, uint8_t x, uint8_t y, st7735_color_16_bit_t color, st7735_color_16_bit_t background, const char *s);
 
+#ifdef __cplusplus
+    }
+#endif

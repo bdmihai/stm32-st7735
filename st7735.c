@@ -39,6 +39,23 @@
 #include <stdlib.h>
 #include "st7735.h"
 
+const st7735_color_16_bit_t st7735_rgb_black   = { ST7735_RGB(0,0,0) };
+const st7735_color_16_bit_t st7735_rgb_white   = { ST7735_RGB(255,255,255) };
+const st7735_color_16_bit_t st7735_rgb_red     = { ST7735_RGB(255,0,0) };
+const st7735_color_16_bit_t st7735_rgb_lime    = { ST7735_RGB(0,255,0) };
+const st7735_color_16_bit_t st7735_rgb_blue    = { ST7735_RGB(0,0,255) };
+const st7735_color_16_bit_t st7735_rgb_yellow  = { ST7735_RGB(255,255,0) };
+const st7735_color_16_bit_t st7735_rgb_cyan    = { ST7735_RGB(0,255,255) };
+const st7735_color_16_bit_t st7735_rgb_magenta = { ST7735_RGB(255,0,255) };
+const st7735_color_16_bit_t st7735_rgb_sylver  = { ST7735_RGB(192,192,192) };
+const st7735_color_16_bit_t st7735_rgb_gray    = { ST7735_RGB(128,128,128) };
+const st7735_color_16_bit_t st7735_rgb_maroon  = { ST7735_RGB(128,0,0) };
+const st7735_color_16_bit_t st7735_rgb_olive   = { ST7735_RGB(128,128,0) };
+const st7735_color_16_bit_t st7735_rgb_green   = { ST7735_RGB(0,128,0) };
+const st7735_color_16_bit_t st7735_rgb_purple  = { ST7735_RGB(128,0,128) };
+const st7735_color_16_bit_t st7735_rgb_teal    = { ST7735_RGB(0,128,128) };
+const st7735_color_16_bit_t st7735_rgb_navy    = { ST7735_RGB(0,0,128) };
+
 static st7735_hw_control_t hw;
 
 void st7735_init(st7735_hw_control_t hw_control)
