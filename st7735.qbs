@@ -26,18 +26,18 @@
  |___________________________________________________________________________*/
  
 Product {
-    name: "st7735"
-    type: "lib"
+    name: 'st7735'
+    type: 'lib'
 
-    Depends { name: "stm32" }
+    Depends { name: 'stm32' }
 
     files: [
-        "*.h",
-        "*.c"
+        '*.h',
+        '*.c'
     ]
 
     Export {
-        Depends { name: "stm32" }
+        Depends { name: 'stm32' }
         stm32.includePaths: [ exportingProduct.sourceDirectory ]
         stm32.libraryPaths: [ exportingProduct.destinationDirectory ]
     }
